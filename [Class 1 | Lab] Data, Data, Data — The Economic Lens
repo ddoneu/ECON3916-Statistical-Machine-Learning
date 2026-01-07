@@ -1,0 +1,82 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Manual Dictionary Construction
+# Data Source: Table 1.4 (Jan 2015)
+# INSTRUCTION: Complete the lists inside the brackets below.
+# Ensure strings have quotes '' and numbers do not.
+
+data = {
+    'Country': [
+        'United States', 'Argentina', 'Australia', 'Brazil', 'Britain', 'China',
+        'Egypt', 'Euro area', 'Hong Kong', 'Indonesia', 'Japan', 'Mexico',
+        'Norway', 'Pakistan', 'Philippines', 'Russia', 'Saudi Arabia',
+        'South Africa', 'South Korea'
+    ],
+    'iso_a3': [
+        'USA', 'ARG', 'AUS', 'BRA', 'GBR', 'CHN',
+        'EGY', 'EUZ', 'HKG', 'IDN', 'JPN', 'MEX',
+        'NOR', 'PAK', 'PHL', 'RUS', 'SAU',
+        'ZAF', 'KOR'
+    ],
+    'local_price': [
+        4.79, 28.00, 5.30, 13.50, 2.89, 17.20,
+        16.93, 3.68, 18.80, 27939, 370, 49.00,
+        48.00, 300, 163, 89.00, 11.00,
+        25.50, 4100
+    ],
+    'dollar_ex': [
+        1.00, 8.62, 1.23, 2.59, 0.66, 6.21,
+        7.36, 0.86, 7.74, 12472, 117.83, 14.63,
+        7.62, 100.67, 44.41, 65.44, 3.75,
+        11.49, 1084.66
+    ]
+}
+
+# Convert to DataFrame
+df = pd.DataFrame(data)
+print(df)
+
+# 1. Calculate the price in USD
+# Logic: Local Price / Exchange Rate
+df['dollar_price'] = df['local_price'] / df['dollar_ex']
+
+# 2. Identify the US Price (The Benchmark)
+us_price = df.loc[df['iso_a3'] == 'USA', 'dollar_price'].values
+
+# 3. Calculate Implied PPP
+# Logic: The exchange rate that WOULD equalise prices
+df['implied_ppp'] = df['local_price'] / us_price
+
+# 4. Calculate Valuation (Undervalued / Overvalued)
+# Logic: (Implied - Actual) / Actual
+df['valuation'] = (df['implied_ppp'] - df['dollar_ex']) / df['dollar_ex']
+
+# 5. Convert to Percentage for readability
+df['valuation_pct'] = df['valuation'] * 100
+
+# Display results sorted by valuation
+print(df[['Country', 'dollar_price', 'valuation_pct']].sort_values('valuation_pct'))
+
+plt.figure(figsize=(10, 6))
+# Create a bar plot
+sns.barplot(x='valuation_pct', y='Country', data=df.sort_values('valuation_pct'), palette="vlag")
+
+# Add a vertical line at 0 (Fair Value)
+plt.axvline(x=0, color='black', linestyle='--')
+
+plt.title('The Big Mac Index: Currency Valuation vs USD (Jan 2015)')
+plt.xlabel('% Under/Over Valued relative to USD')
+plt.show()
+
+# Loading the full dataset from GitHub
+# Note: We must use the "Raw" URL, not the "Blob" URL from the browser bar.
+url = "https://raw.githubusercontent.com/TheEconomist/big-mac-data/master/output-data/big-mac-full-index.csv"
+
+full_df = pd.read_csv(url)
+
+# Inspect the columns
+print(full_df.columns)
+print(full_df.head())
