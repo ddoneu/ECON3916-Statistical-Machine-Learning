@@ -1,4 +1,4 @@
-# The Illusion of Growth & the Composition Effect
+# LAB2 The Illusion of Growth & the Composition Effect
 
 A data-driven walkthrough of how *nominal* wage growth can hide decades of stagnation once inflation is accounted for—and how the apparent “wage boom” of 2020 was largely a statistical artifact driven by workforce composition changes.
 
